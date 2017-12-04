@@ -42,6 +42,9 @@ module RbNaCl
         #
         # @return A new PrivateKey
         def initialize(private_key)
+          if private_key.encoding.to_s == 'UTF-8'
+            private_key = Base64.decode64(private_key).force_encoding(Encoding::BINARY)
+          end
           @private_key = Util.check_string(private_key, BYTES, "Private key")
         end
 

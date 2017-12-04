@@ -100,6 +100,26 @@ module RbNaCl
     end
     alias decrypt open
 
+    def to_bytes(base64_hash)
+      Base64.decode64(base64_hash).force_encoding(Encoding::BINARY) #
+    end
+
+    def to_hash(binary_bytes)
+      Base64.encode64(binary_bytes).delete("\n")
+    end
+
+    def decrypt_hashd(nonce, enciphered_message)
+      nonce = to_bytes(nonce)
+      enciphered_message = to_bytes(enciphered_message)
+      open(nonce + enciphered_message)
+    end
+
+    def encrypt_hashd(message)
+      enciphered_message_with_nonce = box(message)
+      nonce, ciphertext = extract_nonce(enciphered_message_with_nonce)
+      [to_hash(nonce), to_hash(ciphertext)]
+    end
+
     private
 
     def generate_nonce
